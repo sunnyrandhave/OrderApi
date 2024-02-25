@@ -18,10 +18,6 @@ public class OrderController {
 
     @PostMapping("/createorder")
     public ResponseEntity<String> createOrder(@RequestBody Order order){
-        if(order.getUserId()==0){
-            Order order1 = order;
-            return ResponseEntity.internalServerError().body("User Id cant be Zero");
-        }
         orderService.createOrder(order);
         return ResponseEntity.ok().body("Order Created Successfully");
     }

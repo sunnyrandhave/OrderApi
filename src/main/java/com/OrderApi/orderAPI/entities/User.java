@@ -3,39 +3,39 @@ package com.OrderApi.orderAPI.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "User_tb")
+@Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int userId;
+
+    private String userName;
     @Column(unique = true)
-    private int id;
-    private String name;
-    private String phoneNumber;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    private String userPhoneNumber;
     private String userMail;
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserPhoneNumber() {
+        return userPhoneNumber;
+    }
+
+    public void setUserPhoneNumber(String userPhoneNumber) {
+        this.userPhoneNumber = userPhoneNumber;
     }
 
     public String getUserMail() {
@@ -45,5 +45,4 @@ public class User {
     public void setUserMail(String userMail) {
         this.userMail = userMail;
     }
-
 }

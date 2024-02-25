@@ -1,11 +1,10 @@
 package com.OrderApi.orderAPI.entities;
 
-import com.OrderApi.orderAPI.entities.User;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -42,4 +41,7 @@ public class Order {
     public BigDecimal getOrderPrice() {
         return orderPrice;
     }
+
+
+
 }
