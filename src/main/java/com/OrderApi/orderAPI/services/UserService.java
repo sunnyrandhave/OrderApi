@@ -18,9 +18,9 @@ public class UserService {
     public ResponseEntity<String> createUser(User user){
         try {
             Boolean flag =  userRepository.existsById(user.getUserId());
-            if(user.getUserPhoneNumber().length()==10 && !flag && userRepository.existsById(user.getUserId())){
+            if(user.getUserPhoneNumber().length()==10 && !flag){
                 userRepository.save(user);
-                return ResponseEntity.accepted().body("user Created");
+                return ResponseEntity.accepted().body("User Created");
             }else{
                 return ResponseEntity.internalServerError().body("User Already exists or Not Valid");
             }
