@@ -10,9 +10,15 @@ import java.util.List;
 @RestController
 public class ProductController {
     @Autowired
+
+
     private ProductService productService;
 
 
+    @RequestMapping("/test")
+    public String gettest(){
+        return "working";
+    }
     @PostMapping ("/addproduct")
     public Product addProduct(@RequestBody  Product product){
         productService.addProduct(product);

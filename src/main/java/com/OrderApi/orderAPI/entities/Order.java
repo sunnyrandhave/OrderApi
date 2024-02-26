@@ -7,19 +7,24 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import static org.springframework.http.HttpStatus.ACCEPTED;
+
 @Entity
 @Table(name = "order_tb")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
+    @SequenceGenerator(name = "order_seq", sequenceName = "order_sequence", allocationSize = 1)
     private int orderId;
     private Date orderDate = new Date();
     private int userId;
     private int productId;
     private BigDecimal orderPrice;
+    private String OrderStatus ;
 
     public Order() {
         orderDate = new Timestamp(orderDate.getTime());
+        OrderStatus = "ACCEPTED";
     }
 
     public int getOrderId() {
@@ -42,6 +47,7 @@ public class Order {
         return orderPrice;
     }
 
-
-
+    public void setOrderStatus(String orderStatus) {
+        OrderStatus = orderStatus;
+    }
 }
