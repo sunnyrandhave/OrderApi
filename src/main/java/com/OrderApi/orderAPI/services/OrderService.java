@@ -4,6 +4,7 @@ import com.OrderApi.orderAPI.Repositories.OrderRepository;
 import com.OrderApi.orderAPI.Repositories.ProductRepository;
 import com.OrderApi.orderAPI.Repositories.UserRepository;
 import com.OrderApi.orderAPI.entities.Order;
+import com.OrderApi.orderAPI.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,22 +21,24 @@ public class OrderService {
 
     public String createOrder(Order order){
         if(userRepository.existsById(order.getUserId()) && productRepository.existsById(order.getProductId())){
-            orderRepository.save(order);
+            if(order.getDelivery_Address()==null){
+                int id = order.getUserId();
+                User user = userRepository.findById(order.getUserId());
+                order.setDelivery_Address(user.getUserAdress());
+                orderRepository.save(order);
+            }else{
+                orderRepository.save(order);
+            }
             return "Order Created";
         }
         else{
             return "Validation Error User or Product may not Exists";
         }
     }
-    public String updateStatus(@PathVariable int orderId,String status){
-        Boolean flag = orderRepository.existsById(orderId);
-        if(flag) {
-            orderRepository.getReferenceById(orderId).setOrderStatus(status);
-//            order.setOrderStatus(status);
-            return "Order Status Updated";
-        }else{
-            return "Order Not Exists!";
-        }
+
+    public String updateOrderStatus(@PathVariable String status, @PathVariable int orderId){
+        orderRepository.updateOrderStatus(status, orderId);
+        return "Order Status Updated";
     }
 
 

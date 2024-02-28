@@ -1,13 +1,10 @@
 package com.OrderApi.orderAPI.entities;
 
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
-
-import static org.springframework.http.HttpStatus.ACCEPTED;
 
 @Entity
 @Table(name = "order_tb")
@@ -21,10 +18,19 @@ public class Order {
     private int productId;
     private BigDecimal orderPrice;
     private String OrderStatus ;
+    private String delivery_Address;
 
     public Order() {
         orderDate = new Timestamp(orderDate.getTime());
         OrderStatus = "ACCEPTED";
+    }
+
+    public String getDelivery_Address() {
+        return delivery_Address;
+    }
+
+    public void setDelivery_Address(String delivery_Address) {
+        this.delivery_Address = delivery_Address;
     }
 
     public int getOrderId() {

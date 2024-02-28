@@ -26,8 +26,10 @@ public class OrderController {
 
 
     @PostMapping("updatestatus/{orderId}/{orderStatus}")
-    public ResponseEntity<String> updateOrderStatus(@PathVariable int orderId,String orderStatus){
-        return ResponseEntity.ok().body(orderService.updateStatus(orderId,orderStatus));
+    public ResponseEntity<String> updateOrderStatus(@PathVariable int orderId,@PathVariable String orderStatus){
+        return ResponseEntity.ok().body(orderService.updateOrderStatus(orderStatus,orderId));
     }
+
+
 
 }

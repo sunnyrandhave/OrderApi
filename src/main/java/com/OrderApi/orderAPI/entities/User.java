@@ -15,6 +15,16 @@ public class User {
     private String userPhoneNumber;
     private String userMail;
 
+    private String userAdress;
+
+    public String getUserAdress() {
+        return userAdress;
+    }
+
+    public void setUserAdress(String userAdress) {
+        this.userAdress = userAdress;
+    }
+
     public int getUserId() {
         return userId;
     }
