@@ -1,6 +1,7 @@
 package com.OrderApi.orderAPI.entities;
 
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -56,4 +57,6 @@ public class Order {
     public void setOrderStatus(String orderStatus) {
         OrderStatus = orderStatus;
     }
+
+
 }

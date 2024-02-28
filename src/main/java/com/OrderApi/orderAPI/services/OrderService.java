@@ -41,6 +41,10 @@ public class OrderService {
         return "Order Status Updated";
     }
 
+    public String getOrderById(@PathVariable int id){
+        return (orderRepository.getReferenceById(id)).toString();
+    }
+
 
 
 }
