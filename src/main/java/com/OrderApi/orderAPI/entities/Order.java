@@ -17,6 +17,7 @@ public class Order {
     private Date orderDate = new Date();
     private int userId;
     private int productId;
+    private int productQuantity;
     private BigDecimal orderPrice;
     private String OrderStatus ;
     private String delivery_Address;
@@ -58,5 +59,16 @@ public class Order {
         OrderStatus = orderStatus;
     }
 
-
+    @Override
+    public String toString() {
+        return "Order{" +
+                "orderId=" + orderId +
+                ", orderDate=" + orderDate +
+                ", userId=" + userId +
+                ", productId=" + productId +
+                ", orderPrice=" + orderPrice +
+                ", OrderStatus='" + OrderStatus + '\'' +
+                ", delivery_Address='" + delivery_Address + '\'' +
+                '}';
+    }
 }

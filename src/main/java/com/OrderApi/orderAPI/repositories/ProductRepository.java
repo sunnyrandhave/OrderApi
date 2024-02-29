@@ -1,4 +1,4 @@
-package com.OrderApi.orderAPI.Repositories;
+package com.OrderApi.orderAPI.repositories;
 
 import com.OrderApi.orderAPI.entities.Product;
 import org.springframework.data.jpa.repository.JpaRepository;

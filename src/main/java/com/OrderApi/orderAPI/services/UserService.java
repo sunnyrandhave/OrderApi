@@ -1,6 +1,6 @@
 package com.OrderApi.orderAPI.services;
 
-import com.OrderApi.orderAPI.Repositories.UserRepository;
+import com.OrderApi.orderAPI.repositories.UserRepository;
 import com.OrderApi.orderAPI.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
