@@ -18,6 +18,15 @@ public class Order {
     private int userId;
     private int productId;
     private int productQuantity;
+
+    public int getProductQuantity() {
+        return productQuantity;
+    }
+
+    public void setProductQuantity(int productQuantity) {
+        this.productQuantity = productQuantity;
+    }
+
     private BigDecimal orderPrice;
     private String OrderStatus ;
     private String delivery_Address;
@@ -53,6 +62,10 @@ public class Order {
 
     public BigDecimal getOrderPrice() {
         return orderPrice;
+    }
+
+    public void setOrderPrice(BigDecimal orderPrice) {
+        this.orderPrice = orderPrice;
     }
 
     public void setOrderStatus(String orderStatus) {
