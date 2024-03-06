@@ -14,9 +14,7 @@ import java.util.Date;
 public class OrderApiApplication {
 
 	public static void main(String[] args) {
-//		SpringApplication.run(OrderApiApplication.class, args);
-		BigDecimal a = BigDecimal.valueOf(1.00);
-		System.out.println(a);
+		SpringApplication.run(OrderApiApplication.class, args);
 
 	}
 

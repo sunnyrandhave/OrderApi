@@ -24,21 +24,6 @@ public class OrderService {
     @Autowired
     private ProductRepository productRepository;
 
-//    public String createOrder(Order order) throws UserNotExistsException {
-//        if(userRepository.existsById(order.getUserId()) && productRepository.existsById(order.getProductId())){
-//            if(order.getDelivery_Address()==null){
-//                User user = userRepository.findById(order.getUserId());
-//                order.setDelivery_Address(user.getUserAdress());
-//                orderRepository.save(order);
-//            }else{
-//                orderRepository.save(order);
-//            }
-//            return "Order Created";
-//        }
-//        else{
-//            return "Validation Error! User or Product may not Exists";
-//        }
-//    }
     public String createOrder(Order order) throws UserNotExistsException, ProductNotExistsException, ProductNotAvailableException {
         if(!userRepository.existsById(order.getUserId())){
             throw new UserNotExistsException("User With provided ID doesn't exists!");
@@ -53,12 +38,10 @@ public class OrderService {
             if(order.getDelivery_Address()==null){
                 User user = userRepository.findById(order.getUserId());
                 order.setDelivery_Address(user.getUserAdress());
-                productRepository.updateProductQuantity();
                 order.setOrderPrice((BigDecimal.valueOf(order.getProductQuantity()).multiply((productRepository.getReferenceById(order.getProductId()).getPrice()))));
                 orderRepository.save(order);
             }
             else{
-                productRepository.updateProductQuantity();
                 order.setOrderPrice((BigDecimal.valueOf(order.getProductQuantity()).multiply((productRepository.getReferenceById(order.getProductId()).getPrice()))));
                 orderRepository.save(order);
             }
