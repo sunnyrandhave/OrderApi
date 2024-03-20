@@ -30,7 +30,7 @@ public class ProductService {
 
     public String deleteProduct(int id){
         if(productRepository.existsById(id)){
-            productRepository.delete(productRepository.getById(id));
+            productRepository.delete(productRepository.getReferenceById(id));
             return "Product Deleted";
         }else{
             return "Product Not Found";

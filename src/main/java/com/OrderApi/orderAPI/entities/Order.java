@@ -10,9 +10,9 @@ import java.util.Date;
 @Entity
 @Table(name = "order_tb")
 public class Order {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
-    @SequenceGenerator(name = "order_seq", sequenceName = "order_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int orderId;
     private Date orderDate = new Date();
     private int userId;
