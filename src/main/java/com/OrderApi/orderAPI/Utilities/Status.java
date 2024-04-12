@@ -1,6 +1,6 @@
 package com.OrderApi.orderAPI.Utilities;
 
-public enum STATUS {
+public enum Status {
     PENDING,
     ACCEPTED,
     DELIVERED,

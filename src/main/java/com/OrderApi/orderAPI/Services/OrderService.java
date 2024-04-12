@@ -2,7 +2,7 @@ package com.OrderApi.orderAPI.Services;
 
 import com.OrderApi.orderAPI.Entities.Order;
 import com.OrderApi.orderAPI.Entities.Product;
-import com.OrderApi.orderAPI.Utilities.STATUS;
+import com.OrderApi.orderAPI.Utilities.Status;
 import com.OrderApi.orderAPI.Entities.User;
 import com.OrderApi.orderAPI.Repositories.OrderRepository;
 import com.OrderApi.orderAPI.Repositories.UserRepository;
@@ -30,7 +30,7 @@ public class OrderService {
             if(order.getDeliveryAddress()==null){
                 order.setDeliveryAddress(userOptional.get().getUserAddress());
             }
-            order.setOrderStatus(STATUS.PENDING);
+            order.setOrderStatus(Status.PENDING);
             order.setCustomerName(userOptional.get().getUserName());
             order.setOrderValue(productOptional.get().getProductValue());
             order.setOrderValue(productOptional.get().getProductValue().multiply(BigDecimal.valueOf(order.getProductQuantity())));

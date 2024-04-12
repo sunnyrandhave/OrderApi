@@ -1,6 +1,6 @@
 package com.OrderApi.orderAPI.Entities;
 
-import com.OrderApi.orderAPI.Utilities.STATUS;
+import com.OrderApi.orderAPI.Utilities.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,6 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -27,7 +26,7 @@ public class Order {
     private int productQuantity;
     private BigDecimal orderValue;
     @Enumerated(EnumType.STRING)
-    private STATUS orderStatus;
+    private Status orderStatus;
     Order(){
         createdTime = LocalDateTime.now(Clock.systemUTC());
 
