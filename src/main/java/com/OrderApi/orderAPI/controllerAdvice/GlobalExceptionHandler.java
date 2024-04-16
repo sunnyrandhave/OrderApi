@@ -1,15 +1,11 @@
 package com.OrderApi.orderAPI.controllerAdvice;
 
 
-import com.OrderApi.orderAPI.Exceptions.InvalidPhoneNumberException;
-import com.OrderApi.orderAPI.Exceptions.UserNumberAlreadyExistsException;
+import com.OrderApi.orderAPI.Exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,6 +24,22 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleException(Exception e){
         return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(MinimumOrderValueException.class)
+    public ResponseEntity<String> handleOrderValueMinimumException(MinimumOrderValueException minimumOrderValueException){
+        return new ResponseEntity<>(minimumOrderValueException.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<String> handleOrderNotFoundException(OrderNotFoundException orderNotFoundException){
+        return new ResponseEntity<>(orderNotFoundException.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ResponseEntity<String> handleInvalidOrderStatusException(InvalidOrderStatusException invalidOrderStatusException){
+        return new ResponseEntity<>(invalidOrderStatusException.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
 
 
 }

@@ -25,11 +25,11 @@ public class Order {
     private int productId;
     private int productQuantity;
     private BigDecimal orderValue;
+
     @Enumerated(EnumType.STRING)
     private Status orderStatus;
     Order(){
-        createdTime = LocalDateTime.now(Clock.systemUTC());
-
+        createdTime = LocalDateTime.now();
     }
 
     @Override

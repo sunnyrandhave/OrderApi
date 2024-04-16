@@ -1,6 +1,8 @@
 package com.OrderApi.orderAPI.Controller;
 
 import com.OrderApi.orderAPI.Entities.Order;
+import com.OrderApi.orderAPI.Exceptions.InvalidOrderStatusException;
+import com.OrderApi.orderAPI.Exceptions.OrderNotFoundException;
 import com.OrderApi.orderAPI.Services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,5 +24,12 @@ public class OrderController {
     public ResponseEntity<String> getOrderById(@PathVariable int orderId) throws Exception {
         return new ResponseEntity<>(orderService.getOrderById(orderId),HttpStatus.FOUND);
     }
+
+    @PutMapping("/update/{orderId}/{orderStatus}")
+    public ResponseEntity<String> updateOrderStatus(@PathVariable("orderId")int orderId,@PathVariable("orderStatus") String orderStatus) throws  Exception {
+        return new ResponseEntity<>(orderService.updateOrderStatus(orderId, orderStatus),HttpStatus.ACCEPTED);
+    }
+
+
 
 }
