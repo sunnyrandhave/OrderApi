@@ -42,7 +42,7 @@ public class OrderService {
                 throw new MinimumOrderValueException("Minimum order value Should More Than Rs 99");
             }
             else if(order.getOrderValue().intValue()>=5000){
-                throw new MaximumOrderValueException("Maximum order value Should be Less Rs 5000");
+                throw new MaximumOrderValueException("Maximum order value Should be Less Than Rs 5000");
             }
             orderRepository.save(order);
             return order.toString();
