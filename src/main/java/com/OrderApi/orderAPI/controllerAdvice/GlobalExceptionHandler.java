@@ -39,6 +39,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleInvalidOrderStatusException(InvalidOrderStatusException invalidOrderStatusException){
         return new ResponseEntity<>(invalidOrderStatusException.getMessage(),HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(ProductNotAvailableException.class)
+    public ResponseEntity<String> handleProductNotAvailableException(ProductNotAvailableException productNotAvailableException){
+        return new ResponseEntity<>(productNotAvailableException.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 
 
 

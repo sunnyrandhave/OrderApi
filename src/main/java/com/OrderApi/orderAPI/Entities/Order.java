@@ -4,9 +4,7 @@ import com.OrderApi.orderAPI.Utilities.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.math.BigDecimal;
-import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Getter
@@ -27,7 +25,8 @@ public class Order {
     private BigDecimal orderValue;
 
     @Enumerated(EnumType.STRING)
-    private Status orderStatus;
+    public Status orderStatus;
+//    private String orderStatus;
     Order(){
         createdTime = LocalDateTime.now();
     }

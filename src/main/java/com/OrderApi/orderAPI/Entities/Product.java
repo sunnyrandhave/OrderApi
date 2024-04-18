@@ -19,5 +19,6 @@ public class Product {
     private String productName;
 
     private BigDecimal productValue;
+    private int stockAvailable;
 
 }
