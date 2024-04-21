@@ -2,7 +2,7 @@ package com.OrderApi.orderAPI.Utilities;
 
 
 
-public enum Status {
+public enum OrderStatus {
     ACCEPTED,CANCELLED, PENDING, DELIVERED
 }
 

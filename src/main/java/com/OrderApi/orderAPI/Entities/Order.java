@@ -1,9 +1,11 @@
 package com.OrderApi.orderAPI.Entities;
 
-import com.OrderApi.orderAPI.Utilities.Status;
+import com.OrderApi.orderAPI.Utilities.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -25,8 +27,9 @@ public class Order {
     private BigDecimal orderValue;
 
     @Enumerated(EnumType.STRING)
-    public Status orderStatus;
-//    private String orderStatus;
+    private OrderStatus orderStatus;
+
+    private String offerApplied;
     Order(){
         createdTime = LocalDateTime.now();
     }
@@ -40,6 +43,7 @@ public class Order {
                 ", deliveryAddress='" + deliveryAddress + '\'' +
                 ", orderValue=" + orderValue +
                 ", orderStatus=" + orderStatus +
+                ", offerApplied" + offerApplied +
                 '}';
     }
 }

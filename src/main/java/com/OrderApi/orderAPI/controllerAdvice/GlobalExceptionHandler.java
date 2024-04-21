@@ -44,6 +44,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(productNotAvailableException.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(HolidayException.class)
+    public ResponseEntity<String> handleHolidayException(HolidayException holidayException){
+        return new ResponseEntity<>(holidayException.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException userNotFoundException){
+        return new ResponseEntity<>(userNotFoundException.getMessage(),HttpStatus.NOT_FOUND);
+    }
 
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException productNotFoundException){
+        return new ResponseEntity<>(productNotFoundException.getMessage(),HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(PromoCodeExpiredException.class)
+    public ResponseEntity<String> handlePromoCodeExpiredException(PromoCodeExpiredException promoCodeExpiredException){
+        return new ResponseEntity<>(promoCodeExpiredException.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 
 }

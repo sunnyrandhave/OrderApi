@@ -1,9 +1,12 @@
 package com.OrderApi.orderAPI.Services;
 
+import com.OrderApi.orderAPI.Entities.Offer;
 import com.OrderApi.orderAPI.Entities.Order;
 import com.OrderApi.orderAPI.Entities.Product;
 import com.OrderApi.orderAPI.Exceptions.*;
-import com.OrderApi.orderAPI.Utilities.Status;
+import com.OrderApi.orderAPI.Repositories.OfferRepository;
+import com.OrderApi.orderAPI.Utilities.OfferStatus;
+import com.OrderApi.orderAPI.Utilities.OrderStatus;
 import com.OrderApi.orderAPI.Entities.User;
 import com.OrderApi.orderAPI.Repositories.OrderRepository;
 import com.OrderApi.orderAPI.Repositories.UserRepository;
@@ -12,8 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.chrono.ChronoLocalDate;
+import java.util.*;
+import java.util.function.Supplier;
 
 @Service
 public class OrderService {
@@ -24,33 +28,56 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private OfferRepository offerRepository;
+
 
     public String createOrder(Order order) throws Exception {
         Optional<User>  userOptional = userRepository.findById(order.getUserId());
         Optional<Product> productOptional = productRepository.findById(order.getProductId());
-
-        if(userOptional.isPresent() && productOptional.isPresent()){
-            if(order.getDeliveryAddress()==null){
-                order.setDeliveryAddress(userOptional.get().getUserAddress());
-            }if(productOptional.get().getStockAvailable()<order.getProductQuantity()){
-                throw new ProductNotAvailableException(productOptional.get().getProductName()+" Is Currently Out Of Stock");
-            }
-            order.setOrderStatus(Status.PENDING);
-            order.setCustomerName(userOptional.get().getUserName());
-            order.setOrderValue(productOptional.get().getProductValue().multiply(BigDecimal.valueOf(order.getProductQuantity())));
-            if(order.getOrderValue().intValue()<99){
-                throw new MinimumOrderValueException("Minimum order value Should More Than Rs 99");
-            }
-            else if(order.getOrderValue().intValue()>=5000){
-                throw new MaximumOrderValueException("Maximum order value Should be Less Than Rs 5000");
-            }
-            orderRepository.save(order);
-            productOptional.get().setStockAvailable(productOptional.get().getStockAvailable()-order.getProductQuantity());
-            productRepository.save(productOptional.get());
-            return order.toString();
-        }else{
-            throw new Exception("User Id or Product Id may not exist");
+        Optional<Offer> offer = offerRepository.findByofferCode(order.getOfferApplied());
+        if(userOptional.isEmpty()){
+            throw new UserNotFoundException("User does not Exists");
         }
+        if(productOptional.isEmpty()){
+            throw new ProductNotFoundException("Product does not Exists");
+        }
+        if(order.getDeliveryAddress()==null){
+            order.setDeliveryAddress(userOptional.get().getUserAddress());
+        }if(productOptional.get().getStockAvailable()<order.getProductQuantity()){
+            throw new ProductNotAvailableException(productOptional.get().getProductName()+" Is Currently Out Of Stock");
+        }
+//        if(Objects.equals(order.getCreatedTime().getDayOfWeek().toString(),"SUNDAY")){
+//                throw new HolidayException("Sorry! Order's Cannot Be Placed On Sunday");
+//        }
+        order.setOrderStatus(OrderStatus.PENDING);
+        order.setCustomerName(userOptional.get().getUserName());
+        order.setOrderValue(productOptional.get().getProductValue().multiply(BigDecimal.valueOf(order.getProductQuantity())));
+        if(offer.isPresent()){
+            Offer offer1 = offer.get();
+            if(offer1.getExpiryDate().isBefore(ChronoLocalDate.from(order.getCreatedTime()))){
+                offer1.setOfferStatus(OfferStatus.EXPIRED);
+                offerRepository.save(offer1);
+                throw new PromoCodeExpiredException("Provided Promo Code is Expired");
+            }
+            BigDecimal discount = offer1.getDiscount();
+            BigDecimal discountedPrice = order.getOrderValue().multiply(discount);
+            BigDecimal finalordervalue = order.getOrderValue().subtract(discountedPrice.divide(BigDecimal.valueOf(100)));
+            order.setOrderValue(finalordervalue);
+        }else{
+            throw new InvalidPromoCodeException("Invalid Promo Code");
+        }
+        order.setOfferApplied(offer.toString());
+        orderRepository.save(order);
+        if(order.getOrderValue().intValue()<99){
+            throw new MinimumOrderValueException("Minimum order value Should More Than Rs 99");
+        }
+        if(order.getOrderValue().intValue()>=5000){
+            throw new MaximumOrderValueException("Maximum order value Should be Less Than Rs 5000");
+        }
+        productOptional.get().setStockAvailable(productOptional.get().getStockAvailable()-order.getProductQuantity());
+        productRepository.save(productOptional.get());
+        return order.toString();
     }
 
     public String getOrderById(int orderId) throws Exception {
@@ -62,22 +89,22 @@ public class OrderService {
         }
     }
 
-    public String updateOrderStatus(int orderID, String orderStatus) throws OrderNotFoundException, InvalidOrderStatusException {
+    public String updateOrderStatus(int orderID, String orderStatus) throws Exception {
         Optional<Order> optionalOrder = orderRepository.findByOrderId(orderID);
         if(optionalOrder.isPresent()){
             Order order = optionalOrder.get();
             switch (orderStatus.toUpperCase()){
                 case "ACCEPTED":
-                    order.setOrderStatus(Status.ACCEPTED);
+                    order.setOrderStatus(OrderStatus.ACCEPTED);
                     break;
                 case "CANCELLED":
-                    order.setOrderStatus(Status.CANCELLED);
+                    order.setOrderStatus(OrderStatus.CANCELLED);
                     break;
                 case "DELIVERED":
-                    order.setOrderStatus(Status.DELIVERED);
+                    order.setOrderStatus(OrderStatus.DELIVERED);
                     break;
                 case "PENDING":
-                    order.setOrderStatus(Status.PENDING);
+                    order.setOrderStatus(OrderStatus.PENDING);
                     break;
                 default:
                     throw new InvalidOrderStatusException("Status Provided Not Valid");
@@ -87,6 +114,15 @@ public class OrderService {
         }else{
             throw new OrderNotFoundException("Order not Found");
         }
-
     }
+
+    public List<String> getAllOrders(){
+        List<Order> optionalOrders= orderRepository.findAll();
+        List<String> allOrders = new ArrayList<>();
+        for(Order order : optionalOrders){
+                allOrders.add(order.toString());
+        }
+        return allOrders;
+    }
+
 }

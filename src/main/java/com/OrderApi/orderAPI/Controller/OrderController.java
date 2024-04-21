@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/Order")
 public class OrderController {
@@ -14,10 +16,9 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createorder(@RequestBody Order order) throws Exception {
+    public ResponseEntity<String> createOrder(@RequestBody Order order) throws Exception {
         return new ResponseEntity<>(orderService.createOrder(order), HttpStatus.CREATED);
     }
-
     @GetMapping("/get/{orderId}")
     public ResponseEntity<String> getOrderById(@PathVariable int orderId) throws Exception {
         return new ResponseEntity<>(orderService.getOrderById(orderId),HttpStatus.FOUND);
@@ -26,6 +27,11 @@ public class OrderController {
     @PutMapping("/update/{orderId}/{orderStatus}")
     public ResponseEntity<String> updateOrderStatus(@PathVariable("orderId")int orderId,@PathVariable("orderStatus") String orderStatus) throws  Exception {
         return new ResponseEntity<>(orderService.updateOrderStatus(orderId, orderStatus),HttpStatus.OK);
+    }
+
+    @GetMapping("/get/all")
+    public ResponseEntity<List<String>> getAllOrder(){
+        return new ResponseEntity<>(orderService.getAllOrders(),HttpStatus.FOUND);
     }
 
 
