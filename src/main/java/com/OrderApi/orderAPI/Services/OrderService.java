@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.chrono.ChronoLocalDate;
 import java.util.*;
-import java.util.function.Supplier;
 
 @Service
 public class OrderService {
@@ -35,7 +34,6 @@ public class OrderService {
     public String createOrder(Order order) throws Exception {
         Optional<User>  userOptional = userRepository.findById(order.getUserId());
         Optional<Product> productOptional = productRepository.findById(order.getProductId());
-        Optional<Offer> offer = offerRepository.findByofferCode(order.getOfferApplied());
         if(userOptional.isEmpty()){
             throw new UserNotFoundException("User does not Exists");
         }
@@ -47,28 +45,48 @@ public class OrderService {
         }if(productOptional.get().getStockAvailable()<order.getProductQuantity()){
             throw new ProductNotAvailableException(productOptional.get().getProductName()+" Is Currently Out Of Stock");
         }
-//        if(Objects.equals(order.getCreatedTime().getDayOfWeek().toString(),"SUNDAY")){
-//                throw new HolidayException("Sorry! Order's Cannot Be Placed On Sunday");
-//        }
+        if(Objects.equals(order.getCreatedTime().getDayOfWeek().toString(),"SUNDAY")){
+                throw new HolidayException("Sorry! Order's Cannot Be Placed On Sunday");
+        }
         order.setOrderStatus(OrderStatus.PENDING);
         order.setCustomerName(userOptional.get().getUserName());
         order.setOrderValue(productOptional.get().getProductValue().multiply(BigDecimal.valueOf(order.getProductQuantity())));
-        if(offer.isPresent()){
-            Offer offer1 = offer.get();
-            if(offer1.getExpiryDate().isBefore(ChronoLocalDate.from(order.getCreatedTime()))){
-                offer1.setOfferStatus(OfferStatus.EXPIRED);
-                offerRepository.save(offer1);
-                throw new PromoCodeExpiredException("Provided Promo Code is Expired");
+        if(!(order.getPromoCode()==null)) {
+            Optional<Offer> offer = offerRepository.findByPromoCode(order.getPromoCode());
+            Offer temp = offer.get();
+            if (offer.isPresent()) {
+                Offer offer1 = offer.get();
+                if (offer1.getExpiryDate().isBefore(ChronoLocalDate.from(order.getCreatedTime()))) {
+                    offer1.setOfferStatus(OfferStatus.EXPIRED);
+                    offerRepository.save(offer1);
+                    throw new PromoCodeExpiredException("Provided Promo Code is Expired");
+                }
+                BigDecimal discount = offer1.getDiscount();
+                BigDecimal discountedPrice = order.getOrderValue().multiply(discount);
+                BigDecimal finalOrderValue = order.getOrderValue().subtract(discountedPrice.divide(BigDecimal.valueOf(100)));
+                order.setOrderValue(finalOrderValue);
+                order.setPromoCode(offer.toString());
+            } else {
+                throw new InvalidPromoCodeException("Invalid Promo Code");
             }
-            BigDecimal discount = offer1.getDiscount();
-            BigDecimal discountedPrice = order.getOrderValue().multiply(discount);
-            BigDecimal finalordervalue = order.getOrderValue().subtract(discountedPrice.divide(BigDecimal.valueOf(100)));
-            order.setOrderValue(finalordervalue);
+            order.setPromoCode(temp.getPromoCode());
+            if(!offer.isPresent()){
+                throw new InvalidPromoCodeException("Provided Promo Code is Invalid");
+            }else{
+                if(offer.get().getExpiryDate().isBefore(ChronoLocalDate.from(order.getCreatedTime()))){
+                    offer.get().setOfferStatus(OfferStatus.EXPIRED);
+                    throw new PromoCodeExpiredException("Provided Promo Code is Expired");
+                }else{
+                    BigDecimal discount = offer.get().getDiscount();
+                    BigDecimal discountedPrice = order.getOrderValue().multiply(discount);
+                    BigDecimal finalOrderValue = order.getOrderValue().subtract(discountedPrice.divide(BigDecimal.valueOf(100)));
+                    order.setOrderValue(finalOrderValue);
+
+                }
+            }
         }else{
-            throw new InvalidPromoCodeException("Invalid Promo Code");
+            order.setPromoCode(null);
         }
-        order.setOfferApplied(offer.toString());
-        orderRepository.save(order);
         if(order.getOrderValue().intValue()<99){
             throw new MinimumOrderValueException("Minimum order value Should More Than Rs 99");
         }
@@ -77,6 +95,7 @@ public class OrderService {
         }
         productOptional.get().setStockAvailable(productOptional.get().getStockAvailable()-order.getProductQuantity());
         productRepository.save(productOptional.get());
+        orderRepository.save(order);
         return order.toString();
     }
 
@@ -115,12 +134,14 @@ public class OrderService {
             throw new OrderNotFoundException("Order not Found");
         }
     }
-
-    public List<String> getAllOrders(){
+    public List<String> getAllOrders() throws Exception{
         List<Order> optionalOrders= orderRepository.findAll();
         List<String> allOrders = new ArrayList<>();
         for(Order order : optionalOrders){
                 allOrders.add(order.toString());
+        }
+        if(allOrders.isEmpty()){
+            throw new OrderNotFoundException("No Orders Placed");
         }
         return allOrders;
     }

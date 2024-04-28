@@ -10,12 +10,12 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "offer_tb")
+@Table(name = "offer")
 public class Offer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int offerId;
-    private String offerCode;
+    private String promoCode;
     private BigDecimal discount;
     private LocalDate expiryDate;
     @Enumerated(EnumType.STRING)
@@ -27,8 +27,6 @@ public class Offer {
 
     @Override
     public String toString() {
-        return "Offer{" +
-                "offerCode='" + offerCode + '\'' +
-                '}';
+        return promoCode;
     }
 }

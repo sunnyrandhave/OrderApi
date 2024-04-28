@@ -30,7 +30,7 @@ public class OrderController {
     }
 
     @GetMapping("/get/all")
-    public ResponseEntity<List<String>> getAllOrder(){
+    public ResponseEntity<List<String>> getAllOrder() throws Exception {
         return new ResponseEntity<>(orderService.getAllOrders(),HttpStatus.FOUND);
     }
 

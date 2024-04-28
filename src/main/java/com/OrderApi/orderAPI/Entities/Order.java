@@ -4,15 +4,13 @@ import com.OrderApi.orderAPI.Utilities.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "order_tb")
+@Table(name = "Shipping_order")
 public class Order {
 
     @Id
@@ -29,7 +27,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    private String offerApplied;
+    private String promoCode;
     Order(){
         createdTime = LocalDateTime.now();
     }
@@ -43,7 +41,7 @@ public class Order {
                 ", deliveryAddress='" + deliveryAddress + '\'' +
                 ", orderValue=" + orderValue +
                 ", orderStatus=" + orderStatus +
-                ", offerApplied" + offerApplied +
+                ", offerApplied" + promoCode +
                 '}';
     }
 }
