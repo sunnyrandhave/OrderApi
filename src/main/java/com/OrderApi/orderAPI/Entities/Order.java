@@ -5,7 +5,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -27,9 +32,13 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    private String promoCode;
-    Order(){
-        createdTime = LocalDateTime.now();
+    @OneToOne
+    private Offer promoCode;
+    Order() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        String formattedDate = currentDateTime.format(dateTimeFormatter);
+        createdTime = LocalDateTime.parse(formattedDate,dateTimeFormatter);
     }
 
     @Override

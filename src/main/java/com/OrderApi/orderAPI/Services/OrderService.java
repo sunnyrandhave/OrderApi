@@ -52,7 +52,7 @@ public class OrderService {
         order.setCustomerName(userOptional.get().getUserName());
         order.setOrderValue(productOptional.get().getProductValue().multiply(BigDecimal.valueOf(order.getProductQuantity())));
         if(!(order.getPromoCode()==null)) {
-            Optional<Offer> offer = offerRepository.findByPromoCode(order.getPromoCode());
+            Optional<Offer> offer = offerRepository.findByPromoCode(order.getPromoCode().toString());
             Offer temp = offer.get();
             if (offer.isPresent()) {
                 Offer offer1 = offer.get();
@@ -65,11 +65,12 @@ public class OrderService {
                 BigDecimal discountedPrice = order.getOrderValue().multiply(discount);
                 BigDecimal finalOrderValue = order.getOrderValue().subtract(discountedPrice.divide(BigDecimal.valueOf(100)));
                 order.setOrderValue(finalOrderValue);
-                order.setPromoCode(offer.toString());
+                order.setPromoCode(offer1);
+                order.setPromoCode(offer.get());
             } else {
                 throw new InvalidPromoCodeException("Invalid Promo Code");
             }
-            order.setPromoCode(temp.getPromoCode());
+            order.setPromoCode(temp);
             if(!offer.isPresent()){
                 throw new InvalidPromoCodeException("Provided Promo Code is Invalid");
             }else{
