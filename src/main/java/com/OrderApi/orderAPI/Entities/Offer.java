@@ -25,8 +25,15 @@ public class Offer {
         offerStatus = OfferStatus.ACTIVE;
     }
 
+
     @Override
     public String toString() {
         return promoCode;
     }
+
+
+    public Offer(String promoCode) {
+        this.promoCode = promoCode;
+    }
+
 }

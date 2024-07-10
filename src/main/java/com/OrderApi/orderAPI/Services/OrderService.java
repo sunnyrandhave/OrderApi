@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.chrono.ChronoLocalDate;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -32,82 +32,71 @@ public class OrderService {
 
 
     public String createOrder(Order order) throws Exception {
-        Optional<User>  userOptional = userRepository.findById(order.getUserId());
+        Optional<User> userOptional = userRepository.findById(order.getUserId());
         Optional<Product> productOptional = productRepository.findById(order.getProductId());
-        if(userOptional.isEmpty()){
+        if (userOptional.isEmpty()) {
             throw new UserNotFoundException("User does not Exists");
         }
-        if(productOptional.isEmpty()){
+        if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product does not Exists");
         }
-        if(order.getDeliveryAddress()==null){
+        if (order.getDeliveryAddress() == null) {
             order.setDeliveryAddress(userOptional.get().getUserAddress());
-        }if(productOptional.get().getStockAvailable()<order.getProductQuantity()){
-            throw new ProductNotAvailableException(productOptional.get().getProductName()+" Is Currently Out Of Stock");
         }
-        if(Objects.equals(order.getCreatedTime().getDayOfWeek().toString(),"SUNDAY")){
-                throw new HolidayException("Sorry! Order's Cannot Be Placed On Sunday");
+        if (productOptional.get().getStockAvailable() < order.getProductQuantity()) {
+            throw new ProductNotAvailableException(productOptional.get().getProductName() + " Is Currently Out Of Stock");
         }
+//        if (Objects.equals(order.getCreatedTime().getDayOfWeek().toString(), "SUNDAY")) {
+//            throw new HolidayException("Sorry! Order's Cannot Be Placed On Sunday");
+//        }
         order.setOrderStatus(OrderStatus.PENDING);
         order.setCustomerName(userOptional.get().getUserName());
         order.setOrderValue(productOptional.get().getProductValue().multiply(BigDecimal.valueOf(order.getProductQuantity())));
-        if(!(order.getPromoCode()==null)) {
-            Optional<Offer> offer = offerRepository.findByPromoCode(order.getPromoCode().toString());
-            Offer temp = offer.get();
-            if (offer.isPresent()) {
-                Offer offer1 = offer.get();
-                if (offer1.getExpiryDate().isBefore(ChronoLocalDate.from(order.getCreatedTime()))) {
-                    offer1.setOfferStatus(OfferStatus.EXPIRED);
-                    offerRepository.save(offer1);
-                    throw new PromoCodeExpiredException("Provided Promo Code is Expired");
-                }
-                BigDecimal discount = offer1.getDiscount();
-                BigDecimal discountedPrice = order.getOrderValue().multiply(discount);
-                BigDecimal finalOrderValue = order.getOrderValue().subtract(discountedPrice.divide(BigDecimal.valueOf(100)));
-                order.setOrderValue(finalOrderValue);
-                order.setPromoCode(offer1);
-                order.setPromoCode(offer.get());
+        Optional<Offer> offer = offerRepository.findBypromoCode(order.getPromoCode().toString());
+        if (!(order.getPromoCode() == null)) {
+            if (offer.isEmpty()) {
+                throw new InvalidPromoCodeException("Provided Promo code is Invalid");
             } else {
-                throw new InvalidPromoCodeException("Invalid Promo Code");
-            }
-            order.setPromoCode(temp);
-            if(!offer.isPresent()){
-                throw new InvalidPromoCodeException("Provided Promo Code is Invalid");
-            }else{
-                if(offer.get().getExpiryDate().isBefore(ChronoLocalDate.from(order.getCreatedTime()))){
-                    offer.get().setOfferStatus(OfferStatus.EXPIRED);
-                    throw new PromoCodeExpiredException("Provided Promo Code is Expired");
-                }else{
-                    BigDecimal discount = offer.get().getDiscount();
-                    BigDecimal discountedPrice = order.getOrderValue().multiply(discount);
-                    BigDecimal finalOrderValue = order.getOrderValue().subtract(discountedPrice.divide(BigDecimal.valueOf(100)));
-                    order.setOrderValue(finalOrderValue);
-
+                Offer offer1 = offer.get();
+                if (offer1.getExpiryDate().isAfter(LocalDate.now()) || offer1.getExpiryDate().equals(LocalDate.now())) {
+                    BigDecimal discount = offer1.getDiscount();
+                    BigDecimal discountedPrice = (discount.divide(BigDecimal.valueOf(100))).multiply(order.getOrderValue());
+                    BigDecimal finalValue = order.getOrderValue().subtract(discountedPrice);
+                    order.setOrderValue(finalValue);
+                    order.setPromoCode(order.getPromoCode());
+                } else {
+                    offer1.setOfferStatus(OfferStatus.valueOf("EXPIRED"));
+                    throw new PromoCodeExpiredException("Provided Promo Code Is Expired");
                 }
+                offerRepository.save(offer1);
+                order.setPromoCode(offer1);
             }
-        }else{
+        } else {
             order.setPromoCode(null);
+
+            if (order.getOrderValue().intValue() < 99) {
+                throw new MinimumOrderValueException("Minimum order value Should More Than Rs 99");
+            }
+            if (order.getOrderValue().intValue() >= 5000) {
+                throw new MaximumOrderValueException("Maximum order value Should be Less Than Rs 5000");
+            }
         }
-        if(order.getOrderValue().intValue()<99){
-            throw new MinimumOrderValueException("Minimum order value Should More Than Rs 99");
-        }
-        if(order.getOrderValue().intValue()>=5000){
-            throw new MaximumOrderValueException("Maximum order value Should be Less Than Rs 5000");
-        }
-        productOptional.get().setStockAvailable(productOptional.get().getStockAvailable()-order.getProductQuantity());
+        productOptional.get().setStockAvailable(productOptional.get().getStockAvailable() - order.getProductQuantity());
         productRepository.save(productOptional.get());
+        offerRepository.saveAndFlush(offer.get());
         orderRepository.save(order);
         return order.toString();
     }
-
-    public String getOrderById(int orderId) throws Exception {
-        Optional<Order> order = orderRepository.findById(orderId);
-        if(order.isPresent()){
-            return order.get().toString();
-        }else{
-            throw new OrderNotFoundException("Order Id doesn't Exists");
+        public String getOrderById ( int orderId) throws Exception {
+            Optional<Order> order = orderRepository.findById(orderId);
+            if (order.isPresent()) {
+                return order.get().toString();
+            } else {
+                throw new OrderNotFoundException("Order Id doesn't Exists");
+            }
         }
-    }
+
+
 
     public String updateOrderStatus(int orderID, String orderStatus) throws Exception {
         Optional<Order> optionalOrder = orderRepository.findByOrderId(orderID);
