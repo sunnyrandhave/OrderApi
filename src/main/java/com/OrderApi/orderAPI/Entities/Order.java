@@ -33,7 +33,7 @@ public class Order {
     private OrderStatus orderStatus;
 
     @OneToOne
-    private Offer promoCode;
+    private Offer offer;
     Order() {
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -46,11 +46,14 @@ public class Order {
         return "Order{" +
                 "orderId=" + orderId +
                 ", createdTime=" + createdTime +
+                ", userId=" + userId +
                 ", customerName='" + customerName + '\'' +
                 ", deliveryAddress='" + deliveryAddress + '\'' +
+                ", productId=" + productId +
+                ", productQuantity=" + productQuantity +
                 ", orderValue=" + orderValue +
                 ", orderStatus=" + orderStatus +
-                ", offerApplied" + promoCode +
+                ", offer=" + offer +
                 '}';
     }
 }

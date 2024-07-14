@@ -52,49 +52,50 @@ public class OrderService {
         order.setOrderStatus(OrderStatus.PENDING);
         order.setCustomerName(userOptional.get().getUserName());
         order.setOrderValue(productOptional.get().getProductValue().multiply(BigDecimal.valueOf(order.getProductQuantity())));
-        Optional<Offer> offer = offerRepository.findBypromoCode(order.getPromoCode().toString());
-        if (!(order.getPromoCode() == null)) {
-            if (offer.isEmpty()) {
-                throw new InvalidPromoCodeException("Provided Promo code is Invalid");
-            } else {
-                Offer offer1 = offer.get();
-                if (offer1.getExpiryDate().isAfter(LocalDate.now()) || offer1.getExpiryDate().equals(LocalDate.now())) {
-                    BigDecimal discount = offer1.getDiscount();
-                    BigDecimal discountedPrice = (discount.divide(BigDecimal.valueOf(100))).multiply(order.getOrderValue());
-                    BigDecimal finalValue = order.getOrderValue().subtract(discountedPrice);
-                    order.setOrderValue(finalValue);
-                    order.setPromoCode(order.getPromoCode());
-                } else {
-                    offer1.setOfferStatus(OfferStatus.valueOf("EXPIRED"));
-                    throw new PromoCodeExpiredException("Provided Promo Code Is Expired");
-                }
-                offerRepository.save(offer1);
-                order.setPromoCode(offer1);
+        if (order.getOffer() != null && order.getOffer().getPromoCode() != null) {
+            String promoCode = order.getOffer().getPromoCode();
+            Optional<Offer> offerOptional = offerRepository.findByPromoCode(promoCode);
+            if (offerOptional.isEmpty()) {
+                throw new InvalidPromoCodeException("Provided promo code is invalid");
             }
-        } else {
-            order.setPromoCode(null);
 
-            if (order.getOrderValue().intValue() < 99) {
-                throw new MinimumOrderValueException("Minimum order value Should More Than Rs 99");
+            Offer offer = offerOptional.get();
+            if (offer.getExpiryDate().isBefore(LocalDate.now())) {
+                offer.setOfferStatus(OfferStatus.EXPIRED);
+                offerRepository.saveAndFlush(offer);
+                throw new PromoCodeExpiredException("Provided promo code is expired");
             }
-            if (order.getOrderValue().intValue() >= 5000) {
-                throw new MaximumOrderValueException("Maximum order value Should be Less Than Rs 5000");
-            }
+
+            BigDecimal discount = offer.getDiscount();
+            BigDecimal discountedPrice = discount.divide(BigDecimal.valueOf(100)).multiply(order.getOrderValue());
+            BigDecimal finalValue = order.getOrderValue().subtract(discountedPrice);
+            order.setOrderValue(finalValue);
+            order.setOffer(offer);
+        }else{
+            order.setOffer(null);
         }
+
+        if (order.getOrderValue().intValue() < 99) {
+            throw new MinimumOrderValueException("Minimum order value Should More Than Rs 99");
+        }
+        if (order.getOrderValue().intValue() >= 5000) {
+            throw new MaximumOrderValueException("Maximum order value Should be Less Than Rs 5000");
+        }
+
         productOptional.get().setStockAvailable(productOptional.get().getStockAvailable() - order.getProductQuantity());
         productRepository.save(productOptional.get());
-        offerRepository.saveAndFlush(offer.get());
+
         orderRepository.save(order);
         return order.toString();
     }
-        public String getOrderById ( int orderId) throws Exception {
-            Optional<Order> order = orderRepository.findById(orderId);
-            if (order.isPresent()) {
-                return order.get().toString();
-            } else {
-                throw new OrderNotFoundException("Order Id doesn't Exists");
-            }
+    public String getOrderById ( int orderId) throws Exception {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent()) {
+            return order.get().toString();
+        } else {
+            throw new OrderNotFoundException("Order Id doesn't Exists");
         }
+    }
 
 
 
