@@ -26,7 +26,6 @@ public class OrderService {
     private ProductRepository productRepository;
     @Autowired
     private OrderRepository orderRepository;
-
     @Autowired
     private OfferRepository offerRepository;
 
@@ -136,5 +135,25 @@ public class OrderService {
         }
         return allOrders;
     }
+
+    public List<String> getAllOrdersByUser(int userId) throws Exception {
+        if(userRepository.findById(userId).isPresent()) {
+//            List<Order> orders = (orderRepository.findOrdersByUserid(userId));
+            List<Order> allOrders = orderRepository.findAll();
+            List<String> userOrders = new ArrayList<>();
+            for (Order o : allOrders ){
+                if(o.getUserId()==userId){
+                    userOrders.add(o.toString());
+                }
+            }
+//            if(orders.isEmpty()){
+//                throw new OrderNotFoundException("No Orders Placed By User Yet!");
+//            }
+            return userOrders;
+        }else{
+            throw new UserNotFoundException("User Doesn't Exists");
+        }
+    }
+
 
 }

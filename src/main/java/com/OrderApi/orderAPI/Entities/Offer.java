@@ -30,4 +30,10 @@ public class Offer {
         this.promoCode=promoCode;
     }
 
+    @Override
+    public String toString() {
+        return "Offer{" +
+                "promoCode='" + promoCode + '\'' +
+                '}';
+    }
 }

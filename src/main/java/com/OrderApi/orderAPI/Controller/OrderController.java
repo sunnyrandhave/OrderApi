@@ -34,6 +34,10 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getAllOrders(),HttpStatus.FOUND);
     }
 
+    @GetMapping("/get/all/user/{user_id}")
+    public ResponseEntity<List<String>> getAllOrdersByUser(@PathVariable("user_id")int user_id) throws Exception {
+        return new ResponseEntity<>(orderService.getAllOrdersByUser(user_id),HttpStatus.FOUND);
+    }
 
 
 }

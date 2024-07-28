@@ -5,12 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -32,7 +28,8 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "offer_id")
     private Offer offer;
     Order() {
         LocalDateTime currentDateTime = LocalDateTime.now();
