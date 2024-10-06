@@ -12,6 +12,7 @@ import com.OrderApi.orderAPI.Repositories.OrderRepository;
 import com.OrderApi.orderAPI.Repositories.UserRepository;
 import com.OrderApi.orderAPI.Repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -45,9 +46,9 @@ public class OrderService {
         if (productOptional.get().getStockAvailable() < order.getProductQuantity()) {
             throw new ProductNotAvailableException(productOptional.get().getProductName() + " Is Currently Out Of Stock");
         }
-//        if (Objects.equals(order.getCreatedTime().getDayOfWeek().toString(), "SUNDAY")) {
-//            throw new HolidayException("Sorry! Order's Cannot Be Placed On Sunday");
-//        }
+        if (Objects.equals(order.getCreatedTime().getDayOfWeek().toString(), "SUNDAY")) {
+            throw new HolidayException("Sorry! Order's Cannot Be Placed On Sunday");
+        }
         order.setOrderStatus(OrderStatus.PENDING);
         order.setCustomerName(userOptional.get().getUserName());
         order.setOrderValue(productOptional.get().getProductValue().multiply(BigDecimal.valueOf(order.getProductQuantity())));
@@ -146,14 +147,16 @@ public class OrderService {
                     userOrders.add(o.toString());
                 }
             }
-//            if(orders.isEmpty()){
-//                throw new OrderNotFoundException("No Orders Placed By User Yet!");
-//            }
+            if(userOrders.isEmpty()){
+                throw new OrderNotFoundException("No Orders Placed By User Yet!");
+            }
             return userOrders;
         }else{
             throw new UserNotFoundException("User Doesn't Exists");
         }
     }
+
+
 
 
 }

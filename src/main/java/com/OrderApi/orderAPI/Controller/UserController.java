@@ -20,8 +20,8 @@ public class UserController {
         return new ResponseEntity<>("API Working!",HttpStatus.OK);
     }
     @PostMapping("/create")
-    public ResponseEntity<String> createUser(@RequestBody User user) throws UserNumberAlreadyExistsException, InvalidPhoneNumberException {
-        return new ResponseEntity<>(userServices.createUser(user),HttpStatus.CREATED);
+    public ResponseEntity<String> registerUser(@RequestBody User user) throws UserNumberAlreadyExistsException, InvalidPhoneNumberException {
+        return new ResponseEntity<>(userServices.registerUser(user),HttpStatus.CREATED);
     }
 
 

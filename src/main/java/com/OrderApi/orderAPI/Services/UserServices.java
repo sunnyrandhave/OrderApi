@@ -7,7 +7,6 @@ import com.OrderApi.orderAPI.Exceptions.UserNumberAlreadyExistsException;
 import com.OrderApi.orderAPI.Repositories.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,7 +16,7 @@ public class UserServices {
     @Autowired
     private UserRepository userRepository;
 
-    public String createUser(User user) throws UserNumberAlreadyExistsException, InvalidPhoneNumberException {
+    public String registerUser(User user) throws UserNumberAlreadyExistsException, InvalidPhoneNumberException {
         Optional<User> userOptional = userRepository.findByuserNumber(user.getUserNumber());
         if(userOptional.isPresent()){
             throw new UserNumberAlreadyExistsException("Number Provided is already mapped with other user");
@@ -28,7 +27,5 @@ public class UserServices {
             return user.getUserName()+ " Registered SuccessFully";
         }
     }
-
-
 
 }
